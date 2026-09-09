@@ -1,0 +1,6 @@
+{
+  "dataset_name": "my-series",
+  "image_dir": "/absolute/path/to/images",
+  "labels_json": "/absolute/path/to/labels.json",
+  "output_dir": "runs/my-series"
+}

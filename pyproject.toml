@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "semantic-hash-fine-tuning"
+version = "0.1.0"
+description = "Fine-tune OpenCLIP image encoders for image-series retrieval."
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+license-files = ["licenses/*.txt"]
+dependencies = [
+  "torch>=2.8,<3",
+  "open_clip_torch>=3.2,<4",
+  "numpy>=1.26,<3",
+  "Pillow>=10,<13",
+  "scikit-learn>=1.4,<2",
+  "scipy>=1.11,<2",
+  "matplotlib>=3.8,<4",
+  "tqdm>=4.66,<5",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "ruff>=0.11,<1", "build>=1,<2"]
+
+[project.scripts]
+semhash = "semantic_hash.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
