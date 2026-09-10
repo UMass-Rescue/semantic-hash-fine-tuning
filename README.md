@@ -53,6 +53,47 @@ Rerun that command after interruption. It reuses prepared data, resumes training
 
 The first preparation run downloads pretrained weights. The default experiment uses **`hf-hub:timm/ViT-SO400M-16-SigLIP2-384`**, **9 epochs per variant**, a training batch size of **8**, and a learning rate of **1e-5**. Full model weights and optimizer state require substantial RAM and disk space. See [configuration](docs/configuration.md) for smaller models, memory controls, and all defaults.
 
+## Run the example dataset
+
+The [UMass image-series dataset](https://github.com/UMass-Rescue/image-series-dataset) can be downloaded and used for a complete experiment with one script. After activating the conda environment, run from this repository:
+
+```bash
+python scripts/run_example.py \
+  --download-dir /path/to/example-images \
+  --checkpoint-dir /path/to/example-checkpoints \
+  --eval-dir /path/to/example-results
+```
+
+The three folders can be new or empty and must be separate (none may contain another). Git must be installed. The script downloads the dataset into `<download-dir>/repository/series`, generates labels, checks images, and splits **whole series** into train/validation/test sets with seed 42 and 70/15/15 proportions. It runs the original-series training variant for 9 epochs, selects the checkpoint with the highest **validation Hits@1**, and evaluates that checkpoint and the pretrained baseline on the held-out **test** images.
+
+The main outputs are:
+
+| Output | Location |
+| --- | --- |
+| Selected checkpoint | `<checkpoint-dir>/series/best.pt` |
+| Resume checkpoint | `<checkpoint-dir>/series/latest.pt` |
+| Generated experiment config | `<checkpoint-dir>/example_config.json` |
+| Split labels and image audit | `<checkpoint-dir>/workflow/data/` |
+| Selected epoch, validation score, and checkpoint hash | `<eval-dir>/selected_checkpoint.json` |
+| Final test metrics, including baseline | `<eval-dir>/test/metrics.csv` |
+| Test plots | `<eval-dir>/test/plots/` |
+| Validation learning curves | `<eval-dir>/val/plots/` |
+| Result summary and split counts | `<eval-dir>/result.json` |
+
+Repeat the **same command** to reuse the recorded dataset commit and resume unfinished training. A changed configuration requires new checkpoint and evaluation folders; the download folder can be reused. Test results never choose the checkpoint. This example trains on original series only; use the configurable workflow above to compare sub-series training as well.
+
+Add `--download-only` to download images and generate the config without loading a model. To check the process using a smaller CLIP model and fewer epochs:
+
+```bash
+python scripts/run_example.py \
+  --download-dir /path/to/example-images \
+  --checkpoint-dir /path/to/small-model-checkpoints \
+  --eval-dir /path/to/small-model-results \
+  --model ViT-B-32 --pretrained openai --epochs 3
+```
+
+The loss defaults to SigLIP for a SigLIP model name and CLIP otherwise. `--device`, `--batch-size`, `--embedding-batch-size`, `--workers`, `--seed`, and `--grad-checkpointing` are available; see `python scripts/run_example.py --help`. The equivalent installed module, `python -m semantic_hash.example`, works from any directory.
+
 ## Input requirements
 
 You can supply your own labels instead of generating them:
@@ -65,6 +106,8 @@ You can supply your own labels instead of generating them:
 ```
 
 Config paths are relative to the config file. Image paths inside labels are relative to `image_dir`, or absolute paths beneath it. Only labeled images participate. Paths shared by different series are rejected.
+
+By default, all generated files live beneath `output_dir`. Optional `checkpoint_dir` and `evaluation_dir` config fields place model checkpoints and evaluation outputs elsewhere; their paths also resolve relative to the config file.
 
 Use at least **six usable series**, each with at least two distinct, decodable images. The split reserves at least two series each for training, validation, and testing; larger datasets follow the default 70/15/15 proportions. Useful experiments should have substantially more series than this minimum.
 

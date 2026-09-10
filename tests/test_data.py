@@ -43,6 +43,21 @@ def test_bad_config_fails_early(dataset, change):
         load_config(path)
 
 
+def test_separate_output_paths_preserve_default_config_serialization(dataset):
+    path, cfg, _ = dataset
+    assert cfg.checkpoint_root == cfg.output_dir / "checkpoints"
+    assert cfg.evaluation_root == cfg.output_dir / "evaluation"
+    assert "checkpoint_dir" not in cfg.to_dict()
+    assert "evaluation_dir" not in cfg.to_dict()
+    raw = json.loads(path.read_text())
+    raw.update(checkpoint_dir="saved-models", evaluation_dir="reports")
+    path.write_text(json.dumps(raw))
+    configured = load_config(path)
+    assert configured.checkpoint_root == path.parent / "saved-models"
+    assert configured.evaluation_root == path.parent / "reports"
+    assert configured.to_dict()["checkpoint_dir"] == str(path.parent / "saved-models")
+
+
 def test_overlap_and_outside_root_rejected(dataset):
     _, cfg, labels = dataset
     labels["1"].append(labels["0"][0])

@@ -4,6 +4,8 @@ Start with the four required fields in `finetune_config.example.json`. Extra fie
 
 | Setting | Default | Purpose |
 | --- | --- | --- |
+| `checkpoint_dir` | `<output_dir>/checkpoints` | Optional separate root for model checkpoints. |
+| `evaluation_dir` | `<output_dir>/evaluation` | Optional separate root for evaluation CSVs, plots, and caches. |
 | `model.name` | `hf-hub:timm/ViT-SO400M-16-SigLIP2-384` | OpenCLIP model identifier. |
 | `model.pretrained` | `null` | Required pretrained tag/path when using a built-in model name. |
 | `seed` | `42` | Parent-series split, training batches, and epoch augmentation seeds. |

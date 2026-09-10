@@ -43,7 +43,7 @@ def evaluate(
     runs = [("pretrained", "pretrained", None)]
     if not baseline_only:
         for name in variants:
-            checkpoint_dir = cfg.output_dir / "checkpoints" / name
+            checkpoint_dir = cfg.checkpoint_root / name
             best_path = checkpoint_dir / "best.pt"
             if not best_path.is_file():
                 raise ValueError(f"Missing {best_path}. Train first, or use --baseline-only.")
@@ -56,7 +56,7 @@ def evaluate(
                     )
                 )
     paths, series = flatten_labels(read_json(cfg.output_dir / "data" / f"{split}_series.json"))
-    output = cfg.output_dir / "evaluation" / split
+    output = cfg.evaluation_root / split
     rows = []
     for name, checkpoint_name, checkpoint_path in runs:
         signature = fingerprint(
@@ -116,7 +116,7 @@ def evaluate(
     make_plots(rows, output / "plots", split)
     validation_rows = []
     for name in variants:
-        history_path = cfg.output_dir / "checkpoints" / name / "history.json"
+        history_path = cfg.checkpoint_root / name / "history.json"
         if history_path.is_file():
             for epoch in read_json(history_path):
                 validation_rows.extend(
@@ -125,7 +125,7 @@ def evaluate(
                     if row["k"] in cfg.evaluation.k
                 )
     if validation_rows:
-        make_plots(validation_rows, cfg.output_dir / "evaluation" / "val" / "plots", "val")
+        make_plots(validation_rows, cfg.evaluation_root / "val" / "plots", "val")
     LOG.info("Evaluation report: %s", output / "metrics.csv")
     return output / "metrics.csv"
 

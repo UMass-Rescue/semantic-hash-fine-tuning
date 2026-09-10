@@ -107,6 +107,26 @@ def test_single_variant_and_baseline_only(dataset, tiny_openclip):
     )
 
 
+def test_separate_checkpoint_and_evaluation_folders(dataset, tiny_openclip):
+    import json
+
+    config_path, cfg, _ = dataset
+    raw = read_json(config_path)
+    raw.update(checkpoint_dir="saved-models", evaluation_dir="final-results")
+    raw["clustering"]["enabled"] = False
+    config_path.write_text(json.dumps(raw))
+    assert main(["run", "--config", str(config_path)]) == 0
+    checkpoints = config_path.parent / "saved-models"
+    evaluation = config_path.parent / "final-results"
+    assert (checkpoints / "series/best.pt").is_file()
+    assert (checkpoints / "series/latest.pt").is_file()
+    assert (evaluation / "test/metrics.csv").is_file()
+    assert (evaluation / "val/plots/accuracy_at_k.png").is_file()
+    assert not (cfg.output_dir / "checkpoints").exists()
+    assert not (cfg.output_dir / "evaluation").exists()
+    assert main(["run", "--config", str(config_path)]) == 0
+
+
 def test_interrupted_training_resumes_same_result(dataset, tiny_openclip, monkeypatch):
     import semantic_hash.training as training
 

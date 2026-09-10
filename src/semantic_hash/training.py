@@ -166,7 +166,7 @@ def train(cfg: Config, *, variant: str | None = None, resume: bool = False):
 
 
 def _train_variant(cfg: Config, variant: str, data_fingerprint: str, resume: bool):
-    run_dir = cfg.output_dir / "checkpoints" / variant
+    run_dir = cfg.checkpoint_root / variant
     latest_path = run_dir / "latest.pt"
     if latest_path.exists() and not resume:
         raise ValueError(f"Training already exists in {run_dir}. Use --resume to continue.")

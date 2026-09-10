@@ -58,6 +58,16 @@ class Config:
     split_fractions: list[float] = field(default_factory=lambda: [0.7, 0.15, 0.15])
     deduplicate_images: bool = False
     phash_threshold: int = 4
+    checkpoint_dir: Path | None = None
+    evaluation_dir: Path | None = None
+
+    @property
+    def checkpoint_root(self) -> Path:
+        return self.checkpoint_dir or self.output_dir / "checkpoints"
+
+    @property
+    def evaluation_root(self) -> Path:
+        return self.evaluation_dir or self.output_dir / "evaluation"
 
     @property
     def variants(self) -> list[str]:
@@ -67,6 +77,10 @@ class Config:
         result = asdict(self)
         for key in ("image_dir", "labels_json", "output_dir"):
             result[key] = str(result[key])
+        for key in ("checkpoint_dir", "evaluation_dir"):
+            value = result.pop(key)
+            if value is not None:
+                result[key] = str(value)
         return result
 
 
@@ -107,6 +121,12 @@ def load_config(path: Path, *, require_inputs: bool = True) -> Config:
     for key in ("image_dir", "labels_json", "output_dir"):
         value = Path(raw[key]).expanduser()
         raw[key] = (path.parent / value).resolve()
+    for key in ("checkpoint_dir", "evaluation_dir"):
+        value = raw.get(key)
+        if value is not None:
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"{key} must be a nonempty path string or null.")
+            raw[key] = (path.parent / Path(value).expanduser()).resolve()
     for key, cls in (
         ("model", ModelConfig),
         ("training", TrainingConfig),

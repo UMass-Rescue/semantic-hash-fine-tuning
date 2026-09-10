@@ -24,4 +24,14 @@ python -m pip install -e '.[dev]'
 
 The test suite covers preparation, disjoint parent splits, clustering, audit manifests, cosine ranking/counts, target construction, unique-series batches, both losses and their gradients against OpenCLIP, training updates, frozen text parameters, checkpoint saving, exact CPU resume, cache reuse/invalidation, report generation, and embedding export. Integration tests use synthetic images and a tiny real OpenCLIP vision transformer. Only pretrained-model acquisition is replaced, so no model download or GPU is needed.
 
+The example-script tests additionally clone a temporary Git repository containing synthetic image series, check interrupted downloads and immutable dataset reuse, exercise separate output folders, and verify checkpoint selection is recorded before test evaluation. To check only the real dataset download, without loading model weights:
+
+```bash
+python scripts/run_example.py \
+  --download-dir /path/to/example-images \
+  --checkpoint-dir /path/to/example-checkpoints \
+  --eval-dir /path/to/example-results \
+  --download-only
+```
+
 These checks validate the software workflow. They do not establish fine-tuning quality on a real series dataset, exercise CUDA mixed precision, or verify downloading the full default SigLIP2 model. Those require a separate experiment with real data and suitable hardware.
