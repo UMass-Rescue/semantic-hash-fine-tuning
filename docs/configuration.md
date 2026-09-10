@@ -65,3 +65,7 @@ Preparation saves artifact SHA-256 hashes, the input-label hash, and retained-im
 `latest.pt` includes optimizer/scaler state and history. Resume starts at the next complete epoch and restores the same frozen targets from preparation. A mid-epoch interruption repeats that epoch. Checkpoints and JSON outputs are replaced atomically. There is no multi-process locking or distributed-training support.
 
 The evaluation cache includes the prepared-data fingerprint, checkpoint content hash, split, k values, and metric version. It caches aggregate metrics, not image embeddings or distances. `--recompute` forces new embeddings and metrics; otherwise plots and CSVs can be regenerated from matching cached results.
+
+Final test evaluation writes three separate files under `test/plots/`: `precision_recall.png` (precision versus recall), `hits_at_k.png` (Hits@k versus k), and `precision_at_k.png` (Precision@k versus k). Each model/checkpoint epoch has its own curve. Points come from `evaluation.k`; the k axes use `effective_k` so capped duplicate depths appear once. Validation learning plots under `val/plots/` show metrics across training epochs.
+
+Older runs may contain `test/plots/accuracy_at_k.png`, an epoch-based plot with one point per k when only the selected epoch was evaluated. Rerunning evaluation replaces it with `hits_at_k.png` and removes the obsolete file; cached metrics can be reused without retraining.

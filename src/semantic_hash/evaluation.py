@@ -13,6 +13,11 @@ from .metrics import retrieval_metrics
 from .model import create_model, embed_paths, load_checkpoint
 
 LOG = logging.getLogger(__name__)
+RETRIEVAL_PLOTS = {
+    "precision_recall": "precision_recall.png",
+    "hits_at_k": "hits_at_k.png",
+    "precision_at_k": "precision_at_k.png",
+}
 
 
 def write_csv(path: Path, rows: list[dict]):
@@ -113,7 +118,10 @@ def evaluate(
             "all_checkpoints": all_checkpoints,
         },
     )
-    make_plots(rows, output / "plots", split)
+    if split == "test":
+        make_retrieval_plots(rows, output / "plots")
+    else:
+        make_plots(rows, output / "plots", split)
     validation_rows = []
     for name in variants:
         history_path = cfg.checkpoint_root / name / "history.json"
@@ -128,6 +136,81 @@ def evaluate(
         make_plots(validation_rows, cfg.evaluation_root / "val" / "plots", "val")
     LOG.info("Evaluation report: %s", output / "metrics.csv")
     return output / "metrics.csv"
+
+
+def make_retrieval_plots(rows: list[dict], output: Path) -> dict[str, Path]:
+    """Compare test retrieval across k, with one curve per model/checkpoint epoch."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    output.mkdir(parents=True, exist_ok=True)
+    curves = {}
+    for row in rows:
+        # A selected checkpoint can also be a saved epoch. Capped k values can
+        # repeat the same retrieval depth. Plot each (epoch, effective k) once.
+        key = (row["variant"], row["epoch"])
+        curves.setdefault(key, {})[row["effective_k"]] = row
+    specs = (
+        (
+            "precision_recall",
+            "recall_at_k",
+            "precision_at_k",
+            "Recall (micro)",
+            "Precision (micro)",
+            "Precision vs. recall",
+        ),
+        (
+            "hits_at_k",
+            "effective_k",
+            "accuracy_at_k",
+            "k (images retrieved)",
+            "Hits@k",
+            "Hits at k",
+        ),
+        (
+            "precision_at_k",
+            "effective_k",
+            "precision_at_k",
+            "k (images retrieved)",
+            "Precision@k (micro)",
+            "Precision at k",
+        ),
+    )
+    paths = {}
+    for name, x_key, y_key, x_label, y_label, title in specs:
+        fig, ax = plt.subplots(figsize=(8, 5))
+        for (variant, epoch), by_k in sorted(curves.items()):
+            curve = [by_k[k] for k in sorted(by_k)]
+            baseline = variant == "pretrained"
+            label = (
+                "Pretrained baseline"
+                if baseline
+                else f"Fine-tuned {variant.replace('subseries', 'sub-series')} (epoch {epoch})"
+            )
+            ax.plot(
+                [row[x_key] for row in curve],
+                [row[y_key] for row in curve],
+                marker="o",
+                linestyle="--" if baseline else "-",
+                label=label,
+            )
+        ax.set(xlabel=x_label, ylabel=y_label, title=f"Test retrieval: {title}", ylim=(-0.02, 1.02))
+        if x_key == "effective_k":
+            ax.set_xticks(sorted({row["effective_k"] for row in rows}))
+        else:
+            ax.set_xlim(-0.02, 1.02)
+        ax.grid(alpha=0.2)
+        ax.legend(fontsize="small", loc="best")
+        fig.tight_layout()
+        paths[name] = output / RETRIEVAL_PLOTS[name]
+        fig.savefig(paths[name], dpi=160)
+        plt.close(fig)
+    # Earlier releases wrote an epoch-based test chart under this name. Remove
+    # it only after all replacement plots succeed, so reruns cannot show stale data.
+    (output / "accuracy_at_k.png").unlink(missing_ok=True)
+    return paths
 
 
 def make_plots(rows: list[dict], output: Path, split: str):

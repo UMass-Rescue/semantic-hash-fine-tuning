@@ -121,6 +121,10 @@ def test_example_selects_before_test_evaluation_and_resumes(
     assert {row["variant"] for row in metrics} == {"pretrained", "series"}
     result = read_json(args.eval_dir / "result.json")
     assert sum(split["series"] for split in result["splits"].values()) == 12
+    expected_plots = {"precision_recall.png", "hits_at_k.png", "precision_at_k.png"}
+    assert {p.name for p in (args.eval_dir / "test/plots").glob("*.png")} == expected_plots
+    assert {Path(p).name for p in result["plots"].values()} == expected_plots
+    assert all(Path(p).is_file() for p in result["plots"].values())
     assert (args.checkpoint_dir / "series/best.pt").is_file()
     assert (args.checkpoint_dir / "series/latest.pt").is_file()
     assert not (args.checkpoint_dir / "workflow/checkpoints").exists()
@@ -131,7 +135,14 @@ def test_example_selects_before_test_evaluation_and_resumes(
         pytest.fail("Completed example runs must resume without creating a model.")
 
     monkeypatch.setattr("open_clip.create_model_and_transforms", no_model)
+    for plot in result["plots"].values():
+        Path(plot).unlink()
+    legacy_plot = args.eval_dir / "test/plots/accuracy_at_k.png"
+    legacy_plot.write_bytes(b"obsolete epoch-based plot")
     assert example.run_example(args, repo_url=dataset_repository) == metrics_path
+    assert all(Path(p).is_file() for p in result["plots"].values())
+    assert not legacy_plot.exists()
+    assert (args.eval_dir / "val/plots/accuracy_at_k.png").is_file()
 
 
 def test_example_refuses_unrelated_or_overlapping_outputs(tmp_path):

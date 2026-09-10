@@ -76,9 +76,13 @@ The main outputs are:
 | Split labels and image audit | `<checkpoint-dir>/workflow/data/` |
 | Selected epoch, validation score, and checkpoint hash | `<eval-dir>/selected_checkpoint.json` |
 | Final test metrics, including baseline | `<eval-dir>/test/metrics.csv` |
-| Test plots | `<eval-dir>/test/plots/` |
+| Precision versus recall curve | `<eval-dir>/test/plots/precision_recall.png` |
+| Hits@k versus k | `<eval-dir>/test/plots/hits_at_k.png` |
+| Precision@k versus k | `<eval-dir>/test/plots/precision_at_k.png` |
 | Validation learning curves | `<eval-dir>/val/plots/` |
 | Result summary and split counts | `<eval-dir>/result.json` |
+
+Each test plot compares the pretrained baseline with the selected fine-tuned checkpoint. Points use the configured retrieval depths (1, 5, 10, and 20 by default). The k axes show the actual number of images retrieved; depths capped to the same gallery size are plotted once. The precision/recall curve uses recall on the horizontal axis and precision on the vertical axis. `result.json` includes paths to all three PNG files. Repeating the example command regenerates plots from cached metrics without retraining a completed run.
 
 Repeat the **same command** to reuse the recorded dataset commit and resume unfinished training. A changed configuration requires new checkpoint and evaluation folders; the download folder can be reused. Test results never choose the checkpoint. This example trains on original series only; use the configurable workflow above to compare sub-series training as well.
 

@@ -219,7 +219,7 @@ def run_example(args: argparse.Namespace, *, repo_url: str = DATASET_REPO) -> Pa
         return config_path
 
     from .data import prepare
-    from .evaluation import evaluate
+    from .evaluation import RETRIEVAL_PLOTS, evaluate
     from .model import load_checkpoint
     from .training import train
 
@@ -252,6 +252,10 @@ def run_example(args: argparse.Namespace, *, repo_url: str = DATASET_REPO) -> Pa
             "splits": splits,
             "metrics_csv": str(metrics_path),
             "test_metrics": metrics,
+            "plots": {
+                name: str(metrics_path.parent / "plots" / filename)
+                for name, filename in RETRIEVAL_PLOTS.items()
+            },
         },
     )
     LOG.info(
@@ -260,6 +264,7 @@ def run_example(args: argparse.Namespace, *, repo_url: str = DATASET_REPO) -> Pa
         selection["validation_hits_at_1"],
     )
     LOG.info("Final test results: %s", metrics_path)
+    LOG.info("Test plots: %s", metrics_path.parent / "plots")
     return metrics_path
 
 
