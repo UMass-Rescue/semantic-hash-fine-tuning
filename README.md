@@ -2,8 +2,6 @@
 
 Fine-tune a CLIP image encoder to recognize **image series**: photos of a similar subject, taken around the same time and place. A semantic hash here is a normalized, floating-point image embedding. Match a query to other images with cosine similarity.
 
-This repository brings the necessary parts of the two original [training and evaluation workflows](docs/provenance.md) into one package, one environment, and one config. It prepares the data, trains models on original series and optionally sub-series, selects checkpoints using validation retrieval, and compares them with the pretrained model on a held-out test set.
-
 ## Quick start
 
 Use Python 3.11. From this repository:
@@ -117,7 +115,7 @@ Use at least **six usable series**, each with at least two distinct, decodable i
 
 Preparation checks decoding, removes images with identical decoded pixels, and drops series left with fewer than two images. It records failures, warnings, removals, and affected series in `data/image_audit.json`. Optional perceptual de-duplication is available. Source images are never modified.
 
-Sub-series training is enabled by default, preserving the two-experiment workflow. It splits each training series into visually similar clusters using the pretrained embeddings, average-linkage cosine distance below 0.3, and at least 5 images per retained cluster. If fewer than two clusters survive, preparation explains how to adjust the settings. For smaller datasets or a single original-series experiment, add:
+Sub-series training is enabled by default. It splits each training series into visually similar clusters using the pretrained embeddings, average-linkage cosine distance below 0.3, and at least 5 images per retained cluster. If fewer than two clusters survive, preparation explains how to adjust the settings. For smaller datasets or a single original-series experiment, add:
 
 ```json
 "clustering": {"enabled": false}
