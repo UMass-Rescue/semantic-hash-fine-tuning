@@ -1,6 +1,6 @@
 # Configuration
 
-Start with the four required fields in `finetune_config.example.json`. Extra fields are optional. `examples/advanced_config.json` shows all defaults. Unknown keys, invalid numbers, missing inputs, and inconsistent settings fail before a model is downloaded.
+Start with the four required fields in `finetune_config.example.json`. Extra fields are optional; their defaults are listed below. Unknown keys, invalid numbers, missing inputs, and inconsistent settings fail before a model is downloaded.
 
 | Setting | Default | Purpose |
 | --- | --- | --- |
