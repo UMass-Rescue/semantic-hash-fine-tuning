@@ -36,9 +36,9 @@ All config-relative paths are anchored to the config file's directory. Relative 
 
 The target for a series is the normalized mean of its normalized pretrained image embeddings. These targets remain fixed throughout training and resume. A training batch contains one image from each of several different series, so other batch targets act as negatives. The visual encoder and logit scale/bias are trainable; the text tower is frozen and is not called. The original-series and sub-series runs initialize independently from the pretrained model.
 
-Batch size is reduced, with a warning, if the training split has fewer series than requested. The sampler prioritizes series with the most remaining images and samples each image at most once per epoch. Incomplete batches are dropped, matching upstream; highly unbalanced series can leave images unused in an epoch. The startup log reports the number of images actually used. Epoch seeds change which images are sampled.
+Batch size is reduced, with a warning, if the training split has fewer series than requested. The sampler prioritizes series with the most remaining images and samples each image at most once per epoch. Incomplete batches are dropped; highly unbalanced series can leave images unused in an epoch. The startup log reports the number of images actually used. Epoch seeds change which images are sampled.
 
-For ViT models, AdamW uses beta values `(0.9, 0.98)` and epsilon `1e-6`, as upstream. Other model names use `(0.9, 0.999)` and `1e-8`. Warmup is capped at `total_steps - 1` for very short runs. Validation computes image retrieval after every epoch against original validation-series labels for both variants.
+For ViT models, AdamW uses beta values `(0.9, 0.98)` and epsilon `1e-6`. Other model names use `(0.9, 0.999)` and `1e-8`. Warmup is capped at `total_steps - 1` for very short runs. Validation computes image retrieval after every epoch against original validation-series labels for both variants.
 
 ## A smaller CLIP experiment
 

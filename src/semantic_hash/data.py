@@ -49,7 +49,7 @@ def validate_labels(path: Path, image_dir: Path) -> dict[str, list[str]]:
 
 
 def perceptual_hash(image) -> int:
-    """The upstream 64-bit pHash: 32x32 DCT, threshold its 8x8 low frequencies."""
+    """Compute a 64-bit pHash: 32x32 DCT, threshold its 8x8 low frequencies."""
     from scipy.fft import dctn
 
     pixels = np.asarray(image.convert("L").resize((32, 32), Image.Resampling.LANCZOS))

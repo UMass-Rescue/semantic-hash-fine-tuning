@@ -1,4 +1,4 @@
-"""Leave-one-image-out retrieval, following the upstream Hits/P/R definitions."""
+"""Leave-one-image-out retrieval with Hits@k, precision, and recall metrics."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ def retrieval_metrics(
 ) -> list[dict]:
     """Rank all other labeled images by cosine similarity; aggregate query counts.
 
-    Self is excluded. Precision and recall are micro-averaged, matching upstream.
+    Self is excluded. Precision and recall are micro-averaged.
     Memory is O(chunk_size * N + N * D), with no persisted NxN matrix. Ties use
     input index order. For small galleries, effective_k is capped at N - 1.
     """

@@ -1,4 +1,4 @@
-"""Image-to-fixed-series-target fine-tuning extracted from the OpenCLIP fork."""
+"""Fine-tune image embeddings against fixed series targets."""
 
 from __future__ import annotations
 
@@ -70,7 +70,7 @@ class SeriesDataset(Dataset):
 class UniqueSeriesBatchSampler(Sampler[list[int]]):
     """One image per series per batch; sample each image at most once per epoch.
 
-    Favor series with the most remaining images, as in the source sampler.
+    Favor series with the most remaining images.
     Incomplete batches are dropped so every training example has negatives.
     The plan is seeded per epoch and reports its exact length.
     """
