@@ -209,6 +209,10 @@ nearest = np.argsort(-similarity)[:5]
 
 Embed query and gallery images with the same checkpoint and preprocessing. Checkpoints also contain a full OpenCLIP `state_dict` and can be loaded into the matching model with `open_clip.load_checkpoint`.
 
+## License
+
+This project is licensed under the [MIT License](LICENSE). The [OpenCLIP copyright notice](licenses/open_clip.MIT.txt) is retained for code derived from OpenCLIP.
+
 ## Development
 
 ```bash

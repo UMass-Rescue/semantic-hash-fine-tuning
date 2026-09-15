@@ -8,7 +8,8 @@ version = "0.1.0"
 description = "Fine-tune OpenCLIP image encoders for image-series retrieval."
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
-license-files = ["licenses/*.txt"]
+license = "MIT"
+license-files = ["LICENSE", "licenses/*.txt"]
 dependencies = [
   "torch>=2.8,<3",
   "open_clip_torch>=3.2,<4",
