@@ -223,4 +223,4 @@ ruff format --check .
 python -m build
 ```
 
-Tests use a tiny real OpenCLIP architecture and synthetic images, without pretrained downloads or a GPU. They check loss/gradient agreement with OpenCLIP, retrieval counts, split isolation, training, checkpoint selection, interruption/resume, caching, and embedding export. See [testing](docs/testing.md) for a CPU-only conda setup and [provenance](docs/provenance.md) for the extracted components and intentional changes.
+Tests use a tiny real OpenCLIP architecture and synthetic images, without pretrained downloads or a GPU. They check loss/gradient agreement with OpenCLIP, retrieval counts, split isolation, training, checkpoint selection, interruption/resume, caching, and embedding export. See [testing](docs/testing.md) for a CPU-only conda setup.
