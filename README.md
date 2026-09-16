@@ -213,7 +213,7 @@ Embed query and gallery images with the same checkpoint and preprocessing. Check
 
 This project brings together and refines earlier work on fine-tuning CLIP for image-series retrieval. We thank:
 
-- **Prasanna Lakkur** for implementing series target embedding computation and its training integration in [2026-project-open-clip-sem-hash](https://github.com/UMass-Rescue/2026-project-open-clip-sem-hash), and for the image embedding, series splitting, sub-series clustering, precision/recall evaluation, and experiment workflows in [clip-image-similarity](https://github.com/UMass-Rescue/clip-image-similarity).
+- **Prasanna Lakkur** for developing the computation of series target embeddings and integrating them into fine-tuning. His work on [clip-image-similarity](https://github.com/UMass-Rescue/clip-image-similarity) also provided the image embedding, dataset splitting, sub-series clustering, precision/recall evaluation, and experiment workflows that informed this project.
 - **Jeng Yu Chou** for the original [Hits@k / Accuracy@k evaluator](https://github.com/UMass-Rescue/clip-image-similarity/commit/fd965fc05ec6cc3f760aed17c3771630f18a9837), whose same-series retrieval definition is used here.
 - **The OpenCLIP authors and contributors** for [OpenCLIP](https://github.com/mlfoundations/open_clip), on which the original training repository is based. This project uses OpenCLIP's model and preprocessing implementations and adapts its CLIP/SigLIP loss, AdamW parameter grouping, and learning-rate scheduling logic. Its [MIT copyright and permission notice](licenses/open_clip.MIT.txt) is retained.
 
